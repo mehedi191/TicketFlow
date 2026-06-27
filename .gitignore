@@ -17,5 +17,5 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Editor
+# VS Code
 .vscode/settings.json
