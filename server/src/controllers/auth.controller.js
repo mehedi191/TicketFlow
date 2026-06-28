@@ -1,9 +1,14 @@
-const { registerUser } = require("../services/auth.service");
+const {
+  registerUser,
+  loginUser,
+} = require("../services/auth.service");
+
 const {
   successResponse,
   errorResponse,
 } = require("../utils/response");
 
+// Register
 const register = async (req, res) => {
   try {
     const user = await registerUser(req.body);
@@ -19,6 +24,22 @@ const register = async (req, res) => {
   }
 };
 
+// Login
+const login = async (req, res) => {
+  try {
+    const result = await loginUser(req.body);
+
+    return successResponse(
+      res,
+      "Login successful.",
+      result
+    );
+} catch (error) {
+  return errorResponse(res, error.message, 401);
+}
+};
+
 module.exports = {
   register,
+  login,
 };
