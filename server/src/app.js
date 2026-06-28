@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
+const routes = require("./routes");
+
 const app = express();
 
 // Middleware
@@ -17,5 +19,8 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// API Routes
+app.use("/api", routes);
 
 module.exports = app;
