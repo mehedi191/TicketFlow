@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Health Check Route
+// Health Check
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
