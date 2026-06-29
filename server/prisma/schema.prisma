@@ -28,9 +28,9 @@ enum TicketPriority {
 }
 
 model User {
-  id       String   @id @default(uuid())
+  id       String @id @default(uuid())
   name     String
-  email    String   @unique
+  email    String @unique
   password String
 
   role UserRole @default(CUSTOMER)
@@ -38,12 +38,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relationships
-  createdTickets  Ticket[] @relation("CreatedTickets")
-  assignedTickets Ticket[] @relation("AssignedTickets")
+  // Relations
+  createdTickets  Ticket[]  @relation("CreatedTickets")
+  assignedTickets Ticket[]  @relation("AssignedTickets")
   comments        Comment[]
-
-  @@index([email])
 }
 
 model Ticket {
@@ -61,9 +59,8 @@ model Ticket {
   createdById  String
   assignedToId String?
 
-  // Relationships
-  createdBy User @relation("CreatedTickets", fields: [createdById], references: [id])
-
+  // Relations
+  createdBy  User  @relation("CreatedTickets", fields: [createdById], references: [id])
   assignedTo User? @relation("AssignedTickets", fields: [assignedToId], references: [id])
 
   comments Comment[]
@@ -79,12 +76,13 @@ model Comment {
   message String
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Foreign Keys
   ticketId String
   userId   String
 
-  // Relationships
+  // Relations
   ticket Ticket @relation(fields: [ticketId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
 
