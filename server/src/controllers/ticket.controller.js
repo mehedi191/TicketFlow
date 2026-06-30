@@ -1,4 +1,8 @@
-const { createTicket } = require("../services/ticket.service");
+const {
+  createTicket,
+  getMyTickets,
+} = require("../services/ticket.service");
+
 const {
   successResponse,
   errorResponse,
@@ -22,6 +26,21 @@ const create = async (req, res) => {
   }
 };
 
+const getMine = async (req, res) => {
+  try {
+    const tickets = await getMyTickets(req.user.id);
+
+    return successResponse(
+      res,
+      "My tickets fetched successfully.",
+      tickets
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 500);
+  }
+};
+
 module.exports = {
   create,
+  getMine,
 };

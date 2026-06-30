@@ -4,7 +4,10 @@ const authenticate = require("../middleware/auth.middleware");
 const authorize = require("../middleware/role.middleware");
 const validate = require("../middleware/validate.middleware");
 
-const { create } = require("../controllers/ticket.controller");
+const {
+  create,
+  getMine,
+} = require("../controllers/ticket.controller");
 
 const {
   createTicketSchema,
@@ -19,6 +22,13 @@ router.post(
   authorize("CUSTOMER"),
   validate(createTicketSchema),
   create
+);
+
+// Get My Tickets
+router.get(
+  "/my",
+  authenticate,
+  getMine
 );
 
 module.exports = router;
