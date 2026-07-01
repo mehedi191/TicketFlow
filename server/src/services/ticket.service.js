@@ -68,7 +68,54 @@ const getMyTickets = async (userId) => {
   return tickets;
 };
 
+const getTicketById = async (ticketId) => {
+  const ticket = await prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+    include: {
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      assignedTo: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      comments: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+    },
+  });
+
+  if (!ticket) {
+    throw new Error("Ticket not found.");
+  }
+
+  return ticket;
+};
+
 module.exports = {
   createTicket,
   getMyTickets,
+  getTicketById,
 };

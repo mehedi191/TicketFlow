@@ -1,6 +1,7 @@
 const {
   createTicket,
   getMyTickets,
+  getTicketById,
 } = require("../services/ticket.service");
 
 const {
@@ -40,7 +41,57 @@ const getMine = async (req, res) => {
   }
 };
 
+const getById = async (req, res) => {
+  try {
+    const ticket = await getTicketById(req.params.id);
+
+    const user = req.user;
+
+    // ADMIN can access every ticket
+    if (user.role === "ADMIN") {
+      return successResponse(
+        res,
+        "Ticket fetched successfully.",
+        ticket
+      );
+    }
+
+    // CUSTOMER can access only their own tickets
+    if (
+      user.role === "CUSTOMER" &&
+      ticket.createdById === user.id
+    ) {
+      return successResponse(
+        res,
+        "Ticket fetched successfully.",
+        ticket
+      );
+    }
+
+    // ENGINEER can access only assigned tickets
+    if (
+      user.role === "ENGINEER" &&
+      ticket.assignedToId === user.id
+    ) {
+      return successResponse(
+        res,
+        "Ticket fetched successfully.",
+        ticket
+      );
+    }
+
+    return errorResponse(
+      res,
+      "Forbidden. You do not have permission to view this ticket.",
+      403
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 404);
+  }
+};
+
 module.exports = {
   create,
   getMine,
+  getById,
 };

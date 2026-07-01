@@ -7,6 +7,7 @@ const validate = require("../middleware/validate.middleware");
 const {
   create,
   getMine,
+  getById,
 } = require("../controllers/ticket.controller");
 
 const {
@@ -29,6 +30,13 @@ router.get(
   "/my",
   authenticate,
   getMine
+);
+
+// Get Ticket By ID
+router.get(
+  "/:id",
+  authenticate,
+  getById
 );
 
 module.exports = router;
