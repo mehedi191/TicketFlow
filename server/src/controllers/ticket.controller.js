@@ -2,6 +2,7 @@ const {
   createTicket,
   getMyTickets,
   getTicketById,
+  assignTicket,
 } = require("../services/ticket.service");
 
 const {
@@ -90,8 +91,26 @@ const getById = async (req, res) => {
   }
 };
 
+const assign = async (req, res) => {
+  try {
+    const ticket = await assignTicket(
+      req.params.id,
+      req.body.engineerId
+    );
+
+    return successResponse(
+      res,
+      "Ticket assigned successfully.",
+      ticket
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
 module.exports = {
   create,
   getMine,
   getById,
+  assign,
 };

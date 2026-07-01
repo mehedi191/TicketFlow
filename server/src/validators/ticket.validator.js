@@ -1,5 +1,11 @@
 const { z } = require("zod");
 
+const assignTicketSchema = z.object({
+  engineerId: z
+    .string()
+    .uuid("Invalid engineer ID."),
+});
+
 const createTicketSchema = z.object({
   title: z
     .string()
@@ -21,4 +27,5 @@ const createTicketSchema = z.object({
 
 module.exports = {
   createTicketSchema,
+  assignTicketSchema,
 };
