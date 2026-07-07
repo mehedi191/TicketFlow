@@ -6,6 +6,15 @@ const assignTicketSchema = z.object({
     .uuid("Invalid engineer ID."),
 });
 
+const updateTicketStatusSchema = z.object({
+  status: z.enum([
+    "OPEN",
+    "IN_PROGRESS",
+    "RESOLVED",
+    "CLOSED",
+  ]),
+});
+
 const createTicketSchema = z.object({
   title: z
     .string()
@@ -28,4 +37,5 @@ const createTicketSchema = z.object({
 module.exports = {
   createTicketSchema,
   assignTicketSchema,
+  updateTicketStatusSchema,
 };

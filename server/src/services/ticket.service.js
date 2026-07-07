@@ -173,9 +173,89 @@ const assignTicket = async (ticketId, engineerId) => {
   return updatedTicket;
 };
 
+// Update Ticket Status
+
+const updateTicketStatus = async (
+  ticketId,
+  status,
+  currentUser
+) => {
+  // Find the ticket
+  const ticket = await prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+  });
+
+  if (!ticket) {
+    throw new Error("Ticket not found.");
+  }
+
+  // Authorization
+  if (currentUser.role === "CUSTOMER") {
+    throw new Error(
+      "Customers cannot update ticket status."
+    );
+  }
+
+  if (
+    currentUser.role === "ENGINEER" &&
+    ticket.assignedToId !== currentUser.id
+  ) {
+    throw new Error(
+      "You are not assigned to this ticket."
+    );
+  }
+
+  // Allowed status transitions
+  const allowedTransitions = {
+    OPEN: ["IN_PROGRESS"],
+    IN_PROGRESS: ["RESOLVED"],
+    RESOLVED: ["CLOSED"],
+    CLOSED: [],
+  };
+
+  if (!allowedTransitions[ticket.status].includes(status)) {
+    throw new Error(
+      `Cannot change status from ${ticket.status} to ${status}.`
+    );
+  }
+
+  // Update ticket
+  const updatedTicket = await prisma.ticket.update({
+    where: {
+      id: ticketId,
+    },
+    data: {
+      status,
+    },
+    include: {
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      assignedTo: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return updatedTicket;
+};
+
 module.exports = {
   createTicket,
   getMyTickets,
   getTicketById,
   assignTicket,
+  updateTicketStatus,
 };

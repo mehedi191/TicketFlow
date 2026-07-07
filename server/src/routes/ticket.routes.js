@@ -9,11 +9,13 @@ const {
   getMine,
   getById,
   assign,
+  updateStatus,
 } = require("../controllers/ticket.controller");
 
 const {
   createTicketSchema,
   assignTicketSchema,
+  updateTicketStatusSchema,
 } = require("../validators/ticket.validator");
 
 const router = express.Router();
@@ -41,6 +43,15 @@ router.patch(
   authorize("ADMIN"),
   validate(assignTicketSchema),
   assign
+);
+
+// Update Ticket Status
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorize("ADMIN", "ENGINEER"),
+  validate(updateTicketStatusSchema),
+  updateStatus
 );
 
 // Get Ticket By ID

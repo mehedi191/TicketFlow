@@ -3,6 +3,7 @@ const {
   getMyTickets,
   getTicketById,
   assignTicket,
+  updateTicketStatus,
 } = require("../services/ticket.service");
 
 const {
@@ -108,9 +109,28 @@ const assign = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  try {
+    const ticket = await updateTicketStatus(
+      req.params.id,
+      req.body.status,
+      req.user
+    );
+
+    return successResponse(
+      res,
+      "Ticket status updated successfully.",
+      ticket
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
 module.exports = {
   create,
   getMine,
   getById,
   assign,
+  updateStatus,
 };
