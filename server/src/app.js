@@ -3,6 +3,10 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const routes = require("./routes");
+const ticketRoutes = require("./routes/ticket.routes");
+const commentRoutes = require("./routes/comment.routes");
+
+console.log("commentRoutes:", commentRoutes);
 
 const app = express();
 
