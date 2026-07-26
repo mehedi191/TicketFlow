@@ -4,6 +4,8 @@ const {
   getTicketById,
   assignTicket,
   updateTicketStatus,
+  getAllTicketsService,
+  getDashboardService,
 } = require("../services/ticket.service");
 
 const {
@@ -127,10 +129,40 @@ const updateStatus = async (req, res) => {
   }
 };
 
+const getAllTickets = async (req, res) => {
+  try {
+    const result = await getAllTicketsService(req.query);
+
+    return successResponse(
+      res,
+      "Tickets fetched successfully.",
+      result
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
+const getDashboard = async (req, res) => {
+  try {
+    const data = await getDashboardService();
+
+    return successResponse(
+      res,
+      "Dashboard statistics fetched successfully.",
+      data
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 500);
+  }
+};
+
 module.exports = {
   create,
   getMine,
   getById,
   assign,
   updateStatus,
+  getAllTickets,
+  getDashboard,
 };

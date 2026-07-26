@@ -10,6 +10,8 @@ const {
   getById,
   assign,
   updateStatus,
+  getAllTickets,
+  getDashboard,
 } = require("../controllers/ticket.controller");
 
 const {
@@ -54,11 +56,25 @@ router.patch(
   updateStatus
 );
 
+router.get(
+  "/admin/dashboard",
+  authenticate,
+  authorize("ADMIN"),
+  getDashboard
+);
+
 // Get Ticket By ID
 router.get(
   "/:id",
   authenticate,
   getById
+);
+
+router.get(
+  "/admin/all",
+  authenticate,
+  authorize("ADMIN"),
+  getAllTickets
 );
 
 module.exports = router;

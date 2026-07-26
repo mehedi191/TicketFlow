@@ -252,10 +252,156 @@ const updateTicketStatus = async (
   return updatedTicket;
 };
 
+const getAllTicketsService = async (query) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const where = {};
+
+  // Search
+  if (query.search) {
+    where.OR = [
+      {
+        title: {
+          contains: query.search,
+          mode: "insensitive",
+        },
+      },
+      {
+        description: {
+          contains: query.search,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  // Status filter
+  if (query.status) {
+    where.status = query.status;
+  }
+
+  // Priority filter
+  if (query.priority) {
+    where.priority = query.priority;
+  }
+
+  // Engineer filter
+  if (query.engineerId) {
+    where.assignedToId = query.engineerId;
+  }
+
+  // Sorting
+  const orderBy = {
+    createdAt: query.sort === "oldest" ? "asc" : "desc",
+  };
+
+  const tickets = await prisma.ticket.findMany({
+    where,
+    skip,
+    take: limit,
+    orderBy,
+    include: {
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      assignedTo: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+
+  const total = await prisma.ticket.count({
+    where,
+  });
+
+  return {
+    tickets,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+const getDashboardService = async () => {
+  const [
+    totalTickets,
+    openTickets,
+    inProgressTickets,
+    resolvedTickets,
+    closedTickets,
+    priorityStats,
+  ] = await Promise.all([
+    prisma.ticket.count(),
+
+    prisma.ticket.count({
+      where: { status: "OPEN" },
+    }),
+
+    prisma.ticket.count({
+      where: { status: "IN_PROGRESS" },
+    }),
+
+    prisma.ticket.count({
+      where: { status: "RESOLVED" },
+    }),
+
+    prisma.ticket.count({
+      where: { status: "CLOSED" },
+    }),
+
+    prisma.ticket.groupBy({
+      by: ["priority"],
+      _count: {
+        priority: true,
+      },
+    }),
+  ]);
+
+  const ticketsByPriority = {
+    LOW: 0,
+    MEDIUM: 0,
+    HIGH: 0,
+    CRITICAL: 0,
+  };
+
+  priorityStats.forEach((item) => {
+    ticketsByPriority[item.priority] = item._count.priority;
+  });
+
+  return {
+    totalTickets,
+    openTickets,
+    inProgressTickets,
+    resolvedTickets,
+    closedTickets,
+    ticketsByPriority,
+  };
+};
+
 module.exports = {
   createTicket,
   getMyTickets,
   getTicketById,
   assignTicket,
   updateTicketStatus,
+  getAllTicketsService,
+  getDashboardService,
 };
