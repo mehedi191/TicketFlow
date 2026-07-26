@@ -1,16 +1,18 @@
+const helmet = require("helmet");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const routes = require("./routes");
+const apiLimiter = require("./middleware/rateLimit.middleware");
 const ticketRoutes = require("./routes/ticket.routes");
 const commentRoutes = require("./routes/comment.routes");
 
-console.log("commentRoutes:", commentRoutes);
+const routes = require("./routes");
 
 const app = express();
 
 // Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
@@ -25,6 +27,7 @@ app.get("/health", (req, res) => {
 });
 
 // API Routes
+app.use("/api", apiLimiter);
 app.use("/api", routes);
 
 module.exports = app;
